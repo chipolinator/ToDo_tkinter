@@ -6,6 +6,7 @@ from tkinter import font
 #122faa
 
 
+
 window = Tk()
 window.title("Neva")
 #window.resizable(width=False, height=False)
