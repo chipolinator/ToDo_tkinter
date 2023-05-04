@@ -3,13 +3,22 @@ import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
 from tkinter import font
-#122faa
+import threading
+import time
+import tkinter as tk
+from playsound import playsound
+from tkinter.messagebox import showinfo, \
+    askyesno
 
+
+
+#122faa
+#обновление frame
 
 
 window = Tk()
 window.title("Neva")
-#window.resizable(width=False, height=False)
+window.resizable(width=False, height=False)
 window.iconbitmap('1.ico')
 window.geometry("1000x700")
 
@@ -23,7 +32,6 @@ dick2 = {'1':'January','2':'February','3':'March','4':'April','5':'May','6':'Jun
 enabled = IntVar()
 
 lblist = []
-
 
 def on_checked(button):
     if button["bg"] == "white":
@@ -48,6 +56,63 @@ def addlabel():
     res.place(relx=0, rely=0.125*(len(lblist)), relwidth=1, relheight=0.1)
     lblist.append(res)
     add2.delete(0, END)
+
+
+
+
+def timer1():
+    def count_down(a,b,c):
+        addlabel()
+        newWindow.destroy()
+        for i in range(1,int(b)+1):
+            print(f"Time left: {i}")
+            time.sleep(1)
+        playsound('music.mp3')
+        showinfo("Timer", c)
+
+
+    def start_timer():
+        a = hour1.get()
+        if a == '':
+            a = 0
+        else:
+            a = int(a)
+        b = min1.get()
+        b = int(b)
+        c = add2.get()
+        # Создаем поток
+        t = threading.Thread(target=count_down(a,b,c))
+        # Запускаем поток
+        t.start()
+
+
+    newWindow = tk.Toplevel(window)
+    newWindow.geometry("500x300")
+    newWindow.resizable(width=False, height=False)
+    newWindow.iconbitmap('1.ico')
+
+    clockFrame = Frame(newWindow, background='white')
+    clockFrame.place(relx=0, rely=0, relwidth=1, relheight=0.7)
+
+    hour1 = Entry(clockFrame,font=("Trebuchet MS bold", 50),bg='white')
+    hour1.place(relx=0.1, rely=0.2, relwidth=0.19, relheight=0.45)
+    hour2 = Label(clockFrame,text="час. ",anchor='s',font=("Trebuchet MS bold", 24),bg='white')
+    hour2.place(relx=0.3, rely=0.2, relwidth=0.2, relheight=0.5)
+    min1 = Entry(clockFrame,font=("Trebuchet MS bold", 50),bg='white')
+    min1.place(relx=0.5, rely=0.2, relwidth=0.19, relheight=0.45)
+    min2 = Label(clockFrame,text="мин. ",anchor='s',font=("Trebuchet MS bold", 24),bg='white')
+    min2.place(relx=0.7, rely=0.2, relwidth=0.2, relheight=0.5)
+
+    enterClock = Button(newWindow,
+                        relief=FLAT,
+                        text='Set a reminder',
+                        font=("Trebuchet MS bold", 24),
+                        background='#122faa',
+                        command=start_timer)
+    enterClock.place(relx=0, rely=0.7, relwidth=1, relheight=0.3)
+
+
+
 
 
 
@@ -84,8 +149,8 @@ ico5 = PhotoImage(file="ico5.png")
 add3 = Button(add,
                 relief=FLAT,
                  image=ico5,
-                 background='white')
-                 #command=a)
+                 background='white',
+                 command=timer1)
 
 
 
@@ -144,10 +209,6 @@ today1 = Label(today, image=ico2, background='white')
 
 ico3 = PhotoImage(file="ico3.png")
 week1 = Label(week, image=ico3, background='white')
-
-
-
-
 
 header.place(relwidth=1, relheight=0.2)
 greating.place(relx=0.2, rely=0, relwidth=0.8, relheight=1)
