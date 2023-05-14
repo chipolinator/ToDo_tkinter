@@ -1,20 +1,13 @@
 from tkinter import *
-import tkinter as tk
 from tkinter import ttk
+import sqlite3 as sl
 from datetime import datetime
 from tkinter import font
 import threading
 import time
 import tkinter as tk
 from playsound import playsound
-from tkinter.messagebox import showinfo, \
-    askyesno
-
-
-
-#122faa
-#обновление frame
-
+from tkinter.messagebox import showinfo
 
 window = Tk()
 window.title("Neva")
@@ -26,7 +19,7 @@ weekday = datetime.now().weekday()
 the_day = datetime.now().day
 month = datetime.now().month
 
-dick1 = {'0':'Sunday','1':'Monday','2':'Tuesday','3':'Wednesday','4':'Thursday','5':'Friday','6':'Saturday'}
+dick1 = {'6':'Sunday','0':'Monday','1':'Tuesday','2':'Wednesday','3':'Thursday','4':'Friday','5':'Saturday'}
 dick2 = {'1':'January','2':'February','3':'March','4':'April','5':'May','6':'June','7':'July','8':'August','9':'September','10':'October','11':'November','12':'December'}
 
 enabled = IntVar()
@@ -53,19 +46,18 @@ def addlabel():
                          variable=enabled,
                          anchor='w',
                          command=lambda i=i: on_checked(lblist[i]))
+
     res.place(relx=0, rely=0.125*(len(lblist)), relwidth=1, relheight=0.1)
     lblist.append(res)
     add2.delete(0, END)
 
 
-
-
 def timer1():
     def count_down(a,b,c):
-        addlabel()
+        timeer = 60*b+60*60*a
+        print(timeer)
         newWindow.destroy()
-        for i in range(1,int(b)+1):
-            print(f"Time left: {i}")
+        for i in range(1,int(timeer)+1):
             time.sleep(1)
         playsound('music.mp3')
         showinfo("Timer", c)
@@ -77,13 +69,19 @@ def timer1():
             a = 0
         else:
             a = int(a)
-        b = min1.get()
-        b = int(b)
+        b = int(min1.get())
         c = add2.get()
         # Создаем поток
-        t = threading.Thread(target=count_down(a,b,c))
-        # Запускаем поток
+
+        addlabel()
+        t = threading.Thread(target=count_down, args=(a,b,c))
         t.start()
+
+        # Запускаем поток
+
+
+
+
 
 
     newWindow = tk.Toplevel(window)
@@ -110,11 +108,6 @@ def timer1():
                         background='#122faa',
                         command=start_timer)
     enterClock.place(relx=0, rely=0.7, relwidth=1, relheight=0.3)
-
-
-
-
-
 
 header = tk.Frame(window,
                   background='white')
@@ -192,7 +185,7 @@ week = Frame(llists,
 
 week2 = Button(week,
                 relief=FLAT,
-                 text="Week",
+                 text="Next 5 days",
                  background='white')
                  #command=a)
 
