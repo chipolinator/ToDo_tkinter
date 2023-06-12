@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import ttk
-import sqlite3 as sl
 from datetime import datetime
 import datetime
 from tkinter import font
@@ -9,6 +8,23 @@ import time
 import tkinter as tk
 from playsound import playsound
 from tkinter.messagebox import showinfo
+import sqlite3
+import os
+
+
+lblist = []
+
+conn = sqlite3.connect('database.db')
+c = conn.cursor()
+
+conn.execute("""
+                CREATE TABLE IF NOT EXISTS  database (
+                    day INT,
+                    task TEXT
+                );
+            """)
+conn.commit()
+
 
 window = Tk()
 window.title("Neva")
@@ -20,37 +36,71 @@ today = datetime.date.today()
 weekday = today.weekday()
 the_day = today.day
 month = today.month
+textADD = the_day
 
 dick1 = {'6':'Sunday','0':'Monday','1':'Tuesday','2':'Wednesday','3':'Thursday','4':'Friday','5':'Saturday'}
 dick2 = {'1':'January','2':'February','3':'March', '4':'April','5':'May','6':'June','7':'July','8':'August','9':'September','10':'October','11':'November','12':'December'}
 
 enabled = IntVar()
 
-lblist = []
-
-frameWEEK = tk.Frame(window, background="white")
+frameWEEK = tk.Frame(window, background="white", bd=1, relief="groove")
 frameWEEK.place(relx=0.2, rely=0.2, relwidth=0.8, relheight=0.8)
 
+def buttonClickWEEK(text):
+    global textADD
+    textADD = text
+    dateDAY2.config(text=text)
+    global lblist
+    lblist = []
+    my_list = []
+    i = str(int(textADD) - the_day + 1)
+
+    # Удаление всех дочерних виджетов на things
+    for widget in things.winfo_children():
+        widget.destroy()
+
+    c.execute("SELECT * FROM database WHERE day = " + i)
+    print(i)
+    rows = c.fetchall()
+    print(rows)
+    for row in rows:
+        my_list.append(row[1])
+        enabled = IntVar()
+        i = len(lblist)
+        res = tk.Checkbutton(things,
+                             font=("Trebuchet MS bold", 12),
+                             background='white',
+                             text=row[1],
+                             variable=enabled,
+                             anchor='w',
+                             command=lambda i=i: on_checked(lblist[i]))
+
+        res.place(relx=0, rely=0.125 * (len(my_list)-1), relwidth=1, relheight=0.1)
+        lblist.append(res)
+    main.tkraise()
+
+
+
+
+
 buttons = []
-for i in range(0, 5):
+for i in range(1, 6):
     date = today + datetime.timedelta(days=i)
-    button = tk.Button(frameWEEK, text=date.strftime("%d"), command=lambda dateDAYTEXT=i: main.tkraise())
+    button = tk.Button(frameWEEK, bd=1, relief="groove", font=("Trebuchet MS bold", 28),
+                 background='white', text=date.strftime("%d"), command=lambda text=date.strftime("%d"): buttonClickWEEK(text))
     buttons.append(button)
 
-# Размещаем кнопки равномерно по горизонтали
 for i, button in enumerate(buttons):
-    button.place(relx=0.2*(i)+0.05, rely=0.1, relwidth=0.1, relheight=0.1)
+    button.place(relx=0.208*(i)+0.01, rely=0.02, relwidth=0.15, relheight=0.2)
 
-
-
-def on_checked(button):
-    if button["bg"] == "white":
-        button['font'] = font.Font(family="Trebuchet MS ", size=12, overstrike=True)
-        button.config(bg="gray")
+def on_checked(ch):
+    if ch["bg"] == "white":
+        ch["font"] = font.Font(family="Trebuchet MS ", size=12, overstrike=True)
+        ch.config(bg="gray")
 
     else:
-        button['font'] = font.Font(family= "Trebuchet MS ", size=12, overstrike=False)
-        button.config(bg="white")
+        ch['font'] = font.Font(family= "Trebuchet MS ", size=12, overstrike=False)
+        ch.config(bg="white")
 
 def addlabel():
     enabled = IntVar()
@@ -62,7 +112,8 @@ def addlabel():
                          variable=enabled,
                          anchor='w',
                          command=lambda i=i: on_checked(lblist[i]))
-
+    c.execute("INSERT INTO database VALUES(?, ?);", (int(textADD)-the_day+1, add2.get()))
+    conn.commit()
     res.place(relx=0, rely=0.125*(len(lblist)), relwidth=1, relheight=0.1)
     lblist.append(res)
     add2.delete(0, END)
@@ -71,7 +122,6 @@ def addlabel():
 def timer1():
     def count_down(a,b,c):
         timeer = 60*b+60*60*a
-        print(timeer)
         newWindow.destroy()
         for i in range(1,int(timeer)+1):
             time.sleep(1)
@@ -130,7 +180,7 @@ lists = tk.Frame(window,
                 background='white')
 
 main = tk.Frame(window,
-                background='white')
+                background='white',bd=1, relief="groove")
 
 add = tk.Frame(main,
                 background='white')
@@ -160,7 +210,7 @@ dateDAY1 = tk.Label(dateDAY,
                 font=("Trebuchet MS bold", 12),
                  background='white')
 dateDAY2 = tk.Label(dateDAY,
-                text=dateDAYTEXT,
+                text=the_day,
                 font=("Trebuchet MS bold", 28),
                  background='white')
 dateDAY3 = tk.Label(dateDAY,
@@ -181,7 +231,7 @@ today2 = Button(today,
                 relief=FLAT,
                  text="Today",
                  background='white',
-                command=lambda: main.tkraise())
+                command=lambda: buttonClickWEEK(the_day))
 
 week = Frame(llists,
               background='purple')
@@ -229,5 +279,6 @@ week1.place(relx=0, rely=0, relwidth=0.2, relheight=1)
 week2.place(relx=0.2, rely=0, relwidth=0.8, relheight=1)
 
 main.tkraise()
-
+buttonClickWEEK(the_day)
 window.mainloop()
+conn.close()
