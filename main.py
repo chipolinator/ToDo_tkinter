@@ -60,9 +60,7 @@ def buttonClickWEEK(text):
         widget.destroy()
 
     c.execute("SELECT * FROM database WHERE day = " + i)
-    print(i)
     rows = c.fetchall()
-    print(rows)
     for row in rows:
         my_list.append(row[1])
         enabled = IntVar()
@@ -79,10 +77,6 @@ def buttonClickWEEK(text):
         lblist.append(res)
     main.tkraise()
 
-
-
-
-
 buttons = []
 for i in range(1, 6):
     date = today + datetime.timedelta(days=i)
@@ -94,13 +88,10 @@ for i, button in enumerate(buttons):
     button.place(relx=0.208*(i)+0.01, rely=0.02, relwidth=0.15, relheight=0.2)
 
 def on_checked(ch):
-    if ch["bg"] == "white":
-        ch["font"] = font.Font(family="Trebuchet MS ", size=12, overstrike=True)
-        ch.config(bg="gray")
+    c.execute("DELETE FROM database WHERE day = ? AND task = ?;", (str(int(textADD) - the_day + 1), ch["text"]))
+    conn.commit()
+    buttonClickWEEK(int(dateDAY2["text"]))
 
-    else:
-        ch['font'] = font.Font(family= "Trebuchet MS ", size=12, overstrike=False)
-        ch.config(bg="white")
 
 def addlabel():
     enabled = IntVar()
