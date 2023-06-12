@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import sqlite3 as sl
 from datetime import datetime
+import datetime
 from tkinter import font
 import threading
 import time
@@ -15,26 +16,41 @@ window.resizable(width=False, height=False)
 window.iconbitmap('1.ico')
 window.geometry("1000x700")
 
-weekday = datetime.now().weekday()
-the_day = datetime.now().day
-month = datetime.now().month
+today = datetime.date.today()
+weekday = today.weekday()
+the_day = today.day
+month = today.month
 
 dick1 = {'6':'Sunday','0':'Monday','1':'Tuesday','2':'Wednesday','3':'Thursday','4':'Friday','5':'Saturday'}
-dick2 = {'1':'January','2':'February','3':'March','4':'April','5':'May','6':'June','7':'July','8':'August','9':'September','10':'October','11':'November','12':'December'}
+dick2 = {'1':'January','2':'February','3':'March', '4':'April','5':'May','6':'June','7':'July','8':'August','9':'September','10':'October','11':'November','12':'December'}
 
 enabled = IntVar()
 
 lblist = []
 
+frameWEEK = tk.Frame(window, background="white")
+frameWEEK.place(relx=0.2, rely=0.2, relwidth=0.8, relheight=0.8)
+
+buttons = []
+for i in range(0, 5):
+    date = today + datetime.timedelta(days=i)
+    button = tk.Button(frameWEEK, text=date.strftime("%d"), command=lambda dateDAYTEXT=i: main.tkraise())
+    buttons.append(button)
+
+# Размещаем кнопки равномерно по горизонтали
+for i, button in enumerate(buttons):
+    button.place(relx=0.2*(i)+0.05, rely=0.1, relwidth=0.1, relheight=0.1)
+
+
+
 def on_checked(button):
     if button["bg"] == "white":
-        button['font'] = font.Font(family= "Trebuchet MS ", size=12, overstrike=True)
+        button['font'] = font.Font(family="Trebuchet MS ", size=12, overstrike=True)
         button.config(bg="gray")
 
     else:
         button['font'] = font.Font(family= "Trebuchet MS ", size=12, overstrike=False)
         button.config(bg="white")
-
 
 def addlabel():
     enabled = IntVar()
@@ -62,7 +78,6 @@ def timer1():
         playsound('music.mp3')
         showinfo("Timer", c)
 
-
     def start_timer():
         a = hour1.get()
         if a == '':
@@ -72,17 +87,10 @@ def timer1():
         b = int(min1.get())
         c = add2.get()
         # Создаем поток
-
         addlabel()
         t = threading.Thread(target=count_down, args=(a,b,c))
         t.start()
-
         # Запускаем поток
-
-
-
-
-
 
     newWindow = tk.Toplevel(window)
     newWindow.geometry("500x300")
@@ -94,11 +102,11 @@ def timer1():
 
     hour1 = Entry(clockFrame,font=("Trebuchet MS bold", 50),bg='white')
     hour1.place(relx=0.1, rely=0.2, relwidth=0.19, relheight=0.45)
-    hour2 = Label(clockFrame,text="час. ",anchor='s',font=("Trebuchet MS bold", 24),bg='white')
+    hour2 = Label(clockFrame,text="час. ", anchor='s', font=("Trebuchet MS bold", 24),bg='white')
     hour2.place(relx=0.3, rely=0.2, relwidth=0.2, relheight=0.5)
     min1 = Entry(clockFrame,font=("Trebuchet MS bold", 50),bg='white')
     min1.place(relx=0.5, rely=0.2, relwidth=0.19, relheight=0.45)
-    min2 = Label(clockFrame,text="мин. ",anchor='s',font=("Trebuchet MS bold", 24),bg='white')
+    min2 = Label(clockFrame,text="мин. ", anchor='s', font=("Trebuchet MS bold", 24),bg='white')
     min2.place(relx=0.7, rely=0.2, relwidth=0.2, relheight=0.5)
 
     enterClock = Button(newWindow,
@@ -127,8 +135,7 @@ main = tk.Frame(window,
 add = tk.Frame(main,
                 background='white')
 
-
-background_image=tk.PhotoImage(file="ico4.png")
+background_image = tk.PhotoImage(file="ico4.png")
 
 add1 = Button(add,
               relief=FLAT,
@@ -145,27 +152,24 @@ add3 = Button(add,
                  background='white',
                  command=timer1)
 
-
-
-date = tk.Frame(main,
+dateDAY = tk.Frame(main,
                 background='white')
 
-date1 = tk.Label(date,
+dateDAY1 = tk.Label(dateDAY,
                 text=dick1[str(weekday)],
                 font=("Trebuchet MS bold", 12),
                  background='white')
-date2 = tk.Label(date,
-                text=the_day,
+dateDAY2 = tk.Label(dateDAY,
+                text=dateDAYTEXT,
                 font=("Trebuchet MS bold", 28),
                  background='white')
-date3 = tk.Label(date,
+dateDAY3 = tk.Label(dateDAY,
                 text=dick2[str(month)],
                 font=("Trebuchet MS bold", 12),
                  background='white')
 
 things = tk.Frame(main,
                 background='#f7f7f7')
-
 
 llists = Frame(lists,
             background='white')
@@ -176,23 +180,20 @@ today = Frame(llists,
 today2 = Button(today,
                 relief=FLAT,
                  text="Today",
-                 background='white')
-                 #command=a)
+                 background='white',
+                command=lambda: main.tkraise())
 
 week = Frame(llists,
               background='purple')
 
-
 week2 = Button(week,
                 relief=FLAT,
                  text="Next 5 days",
-                 background='white')
-                 #command=a)
+                 background='white',
+                command=lambda: frameWEEK.tkraise())
 
 separator1 = ttk.Separator(window, orient='horizontal')
 separator2 = ttk.Separator(window, orient='vertical')
-
-
 
 ico1 = PhotoImage(file="ico1.png")
 ico1_label = Label(header, background='white', image=ico1)
@@ -214,10 +215,10 @@ add.place(relx=0.2, rely=0.9, relwidth=0.75, relheight=0.075)
 add1.place(relx=0, rely=0, relwidth=0.075, relheight=1)
 add2.place(relx=0.075, rely=0, relwidth=0.85, relheight=1)
 add3.place(relx=0.925, rely=0, relwidth=0.075, relheight=1)
-date.place(relx=0.01, rely=0.02, relwidth=0.15, relheight=0.2)
-date1.place(relx=0, rely=0, relwidth=1, relheight=0.2)
-date2.place(relx=0, rely=0.2, relwidth=1, relheight=0.6)
-date3.place(relx=0, rely=0.8, relwidth=1, relheight=0.2)
+dateDAY.place(relx=0.01, rely=0.02, relwidth=0.15, relheight=0.2)
+dateDAY1.place(relx=0, rely=0, relwidth=1, relheight=0.2)
+dateDAY2.place(relx=0, rely=0.2, relwidth=1, relheight=0.6)
+dateDAY3.place(relx=0, rely=0.8, relwidth=1, relheight=0.2)
 things.place(relx=0.2, rely=0.02, relwidth=0.75, relheight=0.85)
 llists.place(relx=0.1, rely=0.02, relwidth=0.8, relheight=0.85)
 today.place(relx=0, rely=0, relwidth=1, relheight=0.085)
@@ -226,5 +227,7 @@ today2.place(relx=0.2, rely=0, relwidth=0.8, relheight=1)
 week.place(relx=0, rely=0.085, relwidth=1, relheight=0.085)
 week1.place(relx=0, rely=0, relwidth=0.2, relheight=1)
 week2.place(relx=0.2, rely=0, relwidth=0.8, relheight=1)
+
+main.tkraise()
 
 window.mainloop()
