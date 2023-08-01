@@ -2,6 +2,7 @@ import getpass
 import tkinter as tk
 import datetime
 import calendar
+from functools import partial
 from tkinter import *
 from tkinter import ttk
 
@@ -25,13 +26,26 @@ class NevaApp(tk.Tk):
         ttk.Separator(self, orient='horizontal').place(relx=0, rely=0.2, relwidth=1, relheight=0.0000001)
         ttk.Separator(self, orient='vertical').place(relx=0.2, rely=0, relwidth=0.0000001, relheight=1)
 
-    def put_main_frames(self):
+    def put_main_frames(self, const=0):
+
         self.header_frame = Header(self)
         self.header_frame.place(relwidth=1, relheight=0.2)
-        self.main_frame = MainFrame(self)
-        self.main_frame.place(relx=0.2, rely=0.2, relwidth=0.8, relheight=0.8)
         self.buttons_frame = Buttons(self)
         self.buttons_frame.place(relx=0, rely=0.2, relwidth=0.2, relheight=0.8)
+
+        if const == 0:
+            self.main_frame = MainFrame1(self)
+            self.main_frame.place(relx=0.2, rely=0.2, relwidth=0.8, relheight=0.8)
+        elif const == 1:
+            self.main_frame = MainFrame2(self)
+            self.main_frame.place(relx=0.2, rely=0.2, relwidth=0.8, relheight=0.8)
+
+        ttk.Separator(self, orient='horizontal').place(relx=0, rely=0.2, relwidth=1, relheight=0.0000001)
+        ttk.Separator(self, orient='vertical').place(relx=0.2, rely=0, relwidth=0.0000001, relheight=1)
+
+
+
+
 
 
 class Header(tk.Frame):
@@ -55,7 +69,25 @@ class Header(tk.Frame):
               image=ico1).place(relx=0, rely=0, relwidth=0.2, relheight=1)
 
 
-class MainFrame(tk.Frame):
+
+
+
+class MainFrame2(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self['background'] = self.master['background']
+        self.put_widgets()
+
+    def put_widgets(self):
+        for i in range(5):
+            date = datetime.date.today() + datetime.timedelta(days=i+1)
+            button = tk.Button(self, bd=1, relief="groove", font=("Trebuchet MS bold", 28), background='white',
+                               text=date.strftime("%d"))
+            button.place(relx=0.208 * i + 0.01, rely=0.02, relwidth=0.15, relheight=0.2)
+
+
+
+class MainFrame1(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self['background'] = self.master['background']
@@ -128,11 +160,12 @@ class Tasks(tk.Frame):
     #def put_widgets(self):
         # тут будут появляться задачи
 
-class Buttons(tk.Frame):
+class Buttons(tk.Frame, NevaApp):
     def __init__(self, parent):
         super().__init__(parent)
         self['background'] = self.master['background']
         self.put_widgets()
+
 
     def put_widgets(self):
         global ico2, ico3
@@ -147,7 +180,8 @@ class Buttons(tk.Frame):
         Button(self,
                relief=FLAT,
                text="Today",
-               background=self.master['background']).place(relx=0.25, rely=0.01, relwidth=0.75, relheight=0.075)
+               background=self.master['background'],
+               command=partial(self.master.put_main_frames, 0)).place(relx=0.25, rely=0.01, relwidth=0.75, relheight=0.075)
 
         # вторая кнопка с иконкой переносящая на клалендарик
         ico3 = PhotoImage(file="ico3.png")
@@ -158,7 +192,8 @@ class Buttons(tk.Frame):
         Button(self,
                relief=FLAT,
                text="Next 5 days",
-               background=self.master['background']).place(relx=0.25, rely=0.076, relwidth=0.75, relheight=0.075)
+               background=self.master['background'],
+               command=partial(self.master.put_main_frames, 1)).place(relx=0.25, rely=0.076, relwidth=0.75, relheight=0.075)
 
 
 app = NevaApp()
